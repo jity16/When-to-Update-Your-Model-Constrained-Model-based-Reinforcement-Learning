@@ -1,0 +1,161 @@
+<%- include("header") %>
+
+<h1 class="text-center"> <%= brand %> </h1>
+
+<p>
+    <a target="_blank" href="http://127.0.0.1:20002/"> tensorboard </a>
+</p>
+
+<script type="text/javascript">
+    const do_post = (url, contents, callback) => {
+        $.ajax({
+            method: "POST",
+            url: url,
+            data: contents,
+            timeout: 3000,
+            success: function(data) {
+                callback(data);
+            },
+            error: function() {
+                callback(null);
+            }
+        });
+    };
+</script>
+
+<%
+    const running_runs = runs.slice(1).filter(x => x.is_running);
+    const running_gpus = {};
+    for (const run of running_runs) {
+        running_gpus[run.gpu_id] = (running_gpus[run.gpu_id] || 0) + 1;
+    }
+    
+    const gpu_ids = [];
+    for (const gpu_id in running_gpus) {
+        gpu_ids.push(gpu_id);
+    }
+    gpu_ids.sort();
+    
+    let running_stats = `Total: ${running_runs.length}`;
+    
+    if (gpu_ids.length > 0) {
+        running_stats += " = ";
+        running_stats += gpu_ids.map(x => running_gpus[x]).join(" + ");
+        running_stats += " ( GPU ";
+        running_stats += gpu_ids.join("/");
+        running_stats += " )";
+    }
+%>
+
+<h3> Running | <%= running_stats %> </h3>
+
+<div class="row">
+    <div class="col-xs-12">
+        <br />
+        
+        <table class="table">
+            <tr>
+                <th class="col-xs-1"> ID </th>
+                <th class="col-xs-1"> algo </th>
+                <th class="col-xs-1"> env </th>
+                <th class="col-xs-1"> freq </th>
+                <th class="col-xs-1"> seed </th>
+                <th class="col-xs-1"> gpu_id </th>
+                <th class="col-xs-1"> Status </th>
+                <th class="col-xs-2"> Submit Time </th>
+            </tr>
+            <% for (const run of runs.slice(1).reverse()) if (run.is_running) { %>
+                <% const bg_class = run.is_running ? 'bg-warning' : run.is_stopped ? 'bg-info' : run.is_error ? 'bg-danger' : 'bg-success'; %>
+                <tr class="<%= bg_class %>">
+                    <td> <%= run.run_id %> </a> </td>
+                    <td style="font-size:13px"> <%= run.algo_name%> </td>
+                    <td style="font-size:13px"> <%= run.env_name %> </td>
+                    <td style="font-size:13px"> <%= run.freq_name %> </td>
+                    <td style="font-size:13px"> <%= run.seed %> </td>
+                    <td style="font-size:13px"> <%= run.gpu_id %> </td>
+                    <td style="font-size:13px"> <a href="/detail/<%= run.run_id %>"> <%= run.status %> </a> </td>
+                    <td style="font-size:13px"> <%= run.submit_time %> </td>
+                </tr>
+            <% } %>
+        </table>
+    </div>
+</div>
+
+<%
+    const tensorboard_list = fs.readdirSync(config.tensorboard_logdir_path);
+    const tensorboard_is_linked = {};
+
+    for (const run_id in runs) {
+        tensorboard_is_linked[run_id] = false;
+    }
+    
+    for (const filename of tensorboard_list) {
+        // cat_123__
+        const cat_id = parseInt(filename.split("__")[0].split("cat_")[1]);
+        if (cat_id > 0 && cat_id < 1000000000) {
+            tensorboard_is_linked[cat_id] = true;
+        }
+    }
+%>
+
+<script type="text/javascript">
+    const toggle_check = (id) => {
+        $(`#checkbox_${id}`).attr("disabled", true);
+        
+        const checked = $(`#checkbox_${id}`)[0].checked;
+        const url = checked ? "/tensorboard_add" : "/tensorboard_del";
+        
+        do_post(url, { id }, (data) => {
+            $(`#checkbox_${id}`).attr("disabled", false);
+            let has_error = true;
+            
+            if (!data) {
+                alert("Error! Check your network connection!");
+            } else if (data != "OK") {
+                alert("Error! " + data);
+            } else {
+                has_error = false;
+            }
+            
+            if (has_error) {
+                $(`#checkbox_${id}`)[0].checked = !checked;
+            }
+        });
+    };
+</script>
+
+<h3> All </h3>
+
+<div class="row">
+    <div class="col-xs-12">
+        <br />
+        
+        <table class="table">
+            <tr>
+                <th class="col-xs-1"> ID </th>
+                <th class="col-xs-1"> algo </th>
+                <th class="col-xs-1"> env </th>
+                <th class="col-xs-1"> freq </th>
+                <th class="col-xs-1"> seed </th>
+                <th class="col-xs-1"> gpu_id </th>
+                <th class="col-xs-1"> Status </th>
+                <th class="col-xs-2"> Submit Time </th>
+            </tr>
+            <% for (const run of runs.slice(1).reverse()) { %>
+                <% const bg_class = run.is_running ? 'bg-warning' : run.is_stopped ? 'bg-info' : run.is_error ? 'bg-danger' : 'bg-success'; %>
+                <tr class="<%= bg_class %>">
+                    <td> <input onclick="javascript: toggle_check(<%= run.run_id %>)" type="checkbox" id="checkbox_<%= run.run_id %>" <%= tensorboard_is_linked[run.run_id] ? "checked" : "" %> /> <label for="checkbox_<%= run.run_id %>"> <%= run.run_id %> </label> </td>
+                    <td style="font-size:13px"> <%= run.algo_name%> </td>
+                    <td style="font-size:13px"> <%= run.env_name %> </td>
+                    <td style="font-size:13px"> <%= run.freq_name %> </td>
+                    <td style="font-size:13px"> <%= run.seed %> </td>
+                    <td style="font-size:13px"> <%= run.gpu_id %> </td>
+                    <td style="font-size:13px"> <a href="/detail/<%= run.run_id %>"> <%= run.status %> </a> </td>
+                    <td style="font-size:13px"> <%= run.submit_time %> </td>
+                </tr>
+            <% } %>
+        </table>
+    </div>
+</div>
+
+<%- include("footer") %>

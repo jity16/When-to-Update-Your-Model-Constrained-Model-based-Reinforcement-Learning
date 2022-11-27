@@ -1,0 +1,16 @@
+#!/usr/bin/env python3
+
+import sys
+import os
+import json
+
+if len(sys.argv) - 1 != 1:
+    sys.stderr.write("Usage: %s <run_id>\n" % sys.argv[0])
+    sys.exit(1)
+
+run_id = sys.argv[1]
+
+cmd = "rm tensorboard_logdir/cat_%s__*" % (run_id)
+os.system(cmd)
+
+print("Successfully deleted %s from tensorboard" % run_id)

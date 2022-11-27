@@ -1,0 +1,38 @@
+#!/usr/bin/env python3
+
+import sys
+import os
+import json
+
+if len(sys.argv) - 1 != 2:
+    sys.stderr.write("Usage: %s <run_id_start> <run_id_end> \n" % sys.argv[0])
+    sys.exit(1)
+
+run_id_start = int(sys.argv[1])
+run_id_end = int(sys.argv[2])
+
+for run_id in range(run_id_start, run_id_end + 1):
+    run_id = str(run_id)
+    f = open("run_status/status_%s.txt" % run_id, "r")
+    status = json.loads(f.read())
+    f.close()
+
+    algo_name = status["algo_name"]
+    env_name = status["env_name"]
+    freq_name = status["freq_name"]
+    seed = status["seed"]
+    gpu_id = status["gpu_id"]
+
+    link_name = "__".join([
+        "cat_%s" % run_id,
+        "algo_%s" % algo_name,
+        "env_%s" % env_name,
+        "freq_%s" % freq_name,
+        "seed_%s" % seed,
+        "gpu_%s" % gpu_id,
+    ])
+
+    cmd = "cd tensorboard_logdir && ln -s ../cat-mbrl-lib/log_dir/__catrunner_%s__* %s" % (run_id, link_name)
+    os.system(cmd)
+
+    print("Successfully added %s to tensorboard" % run_id)

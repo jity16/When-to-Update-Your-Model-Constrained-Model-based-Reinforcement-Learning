@@ -1,0 +1,272 @@
+<%- include("header") %>
+
+<h1 class="text-center"> <%= brand %> Wish List </h1>
+
+<%
+    const all_algos = {};
+    const all_envs = {};
+    const all_freqs = {};
+    const all_seeds = {};
+    
+    for (const run of runs.slice(1)) {
+        all_algos[run.algo_name] = 1;
+        all_envs[run.env_name] = 1;
+        all_freqs[run.freq_name] = 1;
+        all_seeds[run.seed] = 1;
+    }
+    
+    for (const wish of wishlist.slice(1)) {
+        all_algos[wish.algo_name] = 1;
+        all_envs[wish.env_name] = 1;
+        all_freqs[wish.freq_name] = 1;
+        all_seeds[wish.seed] = 1;
+    }
+    
+    const list_algos = [];
+    const list_envs = [];
+    const list_freqs = [];
+    const list_seeds = [];
+    
+    for (const algo in all_algos) list_algos.push(algo);
+    for (const env in all_envs) list_envs.push(env);
+    for (const freq in all_freqs) list_freqs.push(freq);
+    for (const seed in all_seeds) list_seeds.push(parseInt(seed));
+    
+    list_algos.sort();
+    list_envs.sort();
+    list_freqs.sort();
+    list_seeds.sort((x,y) => x - y);
+%>
+
+<script type="text/javascript">
+    const do_post = (url, contents, callback) => {
+        $.ajax({
+            method: "POST",
+            url: url,
+            data: contents,
+            timeout: 3000,
+            success: function(data) {
+                callback(data);
+            },
+            error: function() {
+                callback(null);
+            }
+        });
+    };
+    
+    const add_to_wishlist = () => {
+        const algo_name = $("#algo_name").val().trim();
+        const env_name = $("#env_name").val().trim();
+        const freq_name = $("#freq_name").val().trim();
+        const seed = parseInt($("#seed").val().trim());
+        if (!(seed >= 0 && seed <= 1000000000)) {
+            alert("Invalid seed (not an integer in [0, 1e9])");
+            return;
+        }
+        
+        const message = [
+            `algo: "${algo_name}"`,
+            `env: "${env_name}"`,
+            `freq: "${freq_name}"`,
+            `seed: ${seed}`,
+            "",
+            "Add this to wishlist?"
+        ];
+        
+        const result = confirm(message.join("\n"));
+        if (!result) return;
+        
+        const wish = { algo_name, env_name, freq_name, seed };
+        
+        $("#wish_add_button").attr("disabled", true);
+        do_post("/wish_add", wish, (data) => {
+            $("#wish_add_button").attr("disabled", false);
+            if (!data) {
+                alert("Error! Check your network connection!");
+            } else if (data != "OK") {
+                alert("Error! " + data);
+            } else {
+                window.location = window.location;
+            }
+        });
+    };
+    
+    const wish_run = (id) => {
+        const result = confirm(`Run wish ${id}?`);
+        if (!result) return;
+        
+        do_post("/wish_run", { id }, (data) => {
+            if (!data) {
+                alert("Error! Check your network connection!");
+            } else if (data != "OK") {
+                alert("Error! " + data);
+            } else {
+                window.location = window.location;
+            }
+        });
+    };
+    
+    const wish_cancel = (id) => {
+        const result = confirm(`Cancel wish ${id}?`);
+        if (!result) return;
+        
+        do_post("/wish_cancel", { id }, (data) => {
+            if (!data) {
+                alert("Error! Check your network connection!");
+            } else if (data != "OK") {
+                alert("Error! " + data);
+            } else {
+                window.location = window.location;
+            }
+        });
+    };
+</script>
+
+<h3> Add to Wish List </h3>
+
+<div class="row">
+    <div class="col-xs-12">
+        <div class="form-inline">
+            <div class="form-group">
+                <label for="algo_name"> algo </label>
+                <input type="text" class="form-control" id="algo_name" size="25" list="list_algo_name" />
+                <datalist id="list_algo_name">
+                    <% for (const algo_name of list_algos) { %>
+                        <option value="<%= algo_name %>" />
+                    <% } %>
+                </datalist>
+                <font> &nbsp; </font>
+            </div>
+            <div class="form-group">
+                <label for="env_name"> env </label>
+                <input type="text" class="form-control" id="env_name" size="25" list="list_env_name" />
+                <datalist id="list_env_name">
+                    <% for (const env_name of list_envs) { %>
+                        <option value="<%= env_name %>" />
+                    <% } %>
+                </datalist>
+                <font> &nbsp; </font>
+            </div>
+            <div class="form-group">
+                <label for="freq_name"> freq </label>
+                <input type="text" class="form-control" id="freq_name" size="10" list="list_freq_name" />
+                <datalist id="list_freq_name">
+                    <% for (const freq_name of list_freqs) { %>
+                        <option value="<%= freq_name %>" />
+                    <% } %>
+                </datalist>
+                <font> &nbsp; </font>
+            </div>
+            <div class="form-group">
+                <label for="seed"> seed </label>
+                <input type="text" class="form-control" id="seed" size="10" list="list_seed" />
+                <datalist id="list_seed">
+                    <% for (const seed of list_seeds) { %>
+                        <option value="<%= seed %>" />
+                    <% } %>
+                </datalist>
+                <font> &nbsp; </font>
+            </div>
+            
+            <button id="wish_add_button" onclick="javascript: add_to_wishlist()" class="btn btn-primary"> Add </button>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<%
+    const running_runs = runs.slice(1).filter(x => x.is_running);
+    const running_gpus = {};
+    for (const run of running_runs) {
+        running_gpus[run.gpu_id] = (running_gpus[run.gpu_id] || 0) + 1;
+    }
+    
+    const gpu_ids = [];
+    for (const gpu_id in running_gpus) {
+        gpu_ids.push(gpu_id);
+    }
+    gpu_ids.sort();
+    
+    let running_stats = `Total: ${running_runs.length}`;
+    
+    if (gpu_ids.length > 0) {
+        running_stats += " = ";
+        running_stats += gpu_ids.map(x => running_gpus[x]).join(" + ");
+        running_stats += " ( GPU ";
+        running_stats += gpu_ids.join("/");
+        running_stats += " )";
+    }
+%>
+
+<h3> Running | <%= running_stats %> </h3>
+
+<hr>
+
+<h3> Wishing </h3>
+
+<div class="row">
+    <div class="col-xs-12">
+        <br />
+        
+        <table class="table">
+            <tr>
+                <th class="col-xs-1"> ID </th>
+                <th class="col-xs-1"> algo </th>
+                <th class="col-xs-1"> env </th>
+                <th class="col-xs-1"> freq </th>
+                <th class="col-xs-1"> seed </th>
+                <th class="col-xs-1"> Status </th>
+                <th class="col-xs-2"> Submit Time </th>
+                <th class="col-xs-1"> Actions </th>
+            </tr>
+            <% for (const wish of wishlist.slice(1).reverse()) if (wish.status == "Wishing") { %>
+                <% const bg_class = wish.status == "Wishing" ? 'bg-info' : wish.status == "Fulfilled" ? 'bg-success' : 'bg-danger'; %>
+                <tr class="<%= bg_class %>">
+                    <td> <%= wish.id %> </a> </td>
+                    <td style="font-size:13px"> <%= wish.algo_name %> </td>
+                    <td style="font-size:13px"> <%= wish.env_name %> </td>
+                    <td style="font-size:13px"> <%= wish.freq_name %> </td>
+                    <td style="font-size:13px"> <%= wish.seed %> </td>
+                    <td style="font-size:13px"> <%= wish.status %> </td>
+                    <td style="font-size:13px"> <%= wish.submit_time %> </td>
+                    <td style="font-size:13px"> <a href="javascript: wish_run(<%= wish.id %>)"> Run </a> <a href="javascript: wish_cancel(<%= wish.id %>)"> Cancel </a> </td>
+                </tr>
+            <% } %>
+        </table>
+    </div>
+</div>
+
+<h3> All </h3>
+
+<div class="row">
+    <div class="col-xs-12">
+        <br />
+        
+        <table class="table">
+            <tr>
+                <th class="col-xs-1"> ID </th>
+                <th class="col-xs-1"> algo </th>
+                <th class="col-xs-1"> env </th>
+                <th class="col-xs-1"> freq </th>
+                <th class="col-xs-1"> seed </th>
+                <th class="col-xs-1"> Status </th>
+                <th class="col-xs-2"> Submit Time </th>
+            </tr>
+            <% for (const wish of wishlist.slice(1).reverse()) if (1) { %>
+                <% const bg_class = wish.status == "Wishing" ? 'bg-info' : wish.status == "Fulfilled" ? 'bg-success' : 'bg-danger'; %>
+                <tr class="<%= bg_class %>">
+                    <td> <%= wish.id %> </a> </td>
+                    <td style="font-size:13px"> <%= wish.algo_name %> </td>
+                    <td style="font-size:13px"> <%= wish.env_name %> </td>
+                    <td style="font-size:13px"> <%= wish.freq_name %> </td>
+                    <td style="font-size:13px"> <%= wish.seed %> </td>
+                    <td style="font-size:13px"> <%= wish.status %> </td>
+                    <td style="font-size:13px"> <%= wish.submit_time %> </td>
+                </tr>
+            <% } %>
+        </table>
+    </div>
+</div>
+
+<%- include("footer") %>

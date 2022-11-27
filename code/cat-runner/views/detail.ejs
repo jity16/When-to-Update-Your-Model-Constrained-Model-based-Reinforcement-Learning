@@ -1,0 +1,85 @@
+<%- include("header") %>
+
+<h2> Cat Runner # <%= run.run_id %> </h2>
+
+<div class="row">
+    <div class="col-xs-12">
+        <br />
+        
+        <table class="table">
+            <tr>
+                <th class="col-xs-1"> ID </th>
+                <th class="col-xs-1"> algo </th>
+                <th class="col-xs-1"> env </th>
+                <th class="col-xs-1"> freq </th>
+                <th class="col-xs-1"> seed </th>
+                <th class="col-xs-1"> gpu_id </th>
+                <th class="col-xs-1"> Status </th>
+                <th class="col-xs-2"> Submit Time </th>
+            </tr>
+            <% { %>
+                <% const bg_class = run.is_running ? 'bg-warning' : run.is_stopped ? 'bg-info' : run.is_error ? 'bg-danger' : 'bg-success'; %>
+                <tr class="<%= bg_class %>">
+                    <td> <%= run.run_id %> </a> </td>
+                    <td style="font-size:13px"> <%= run.algo_name%> </td>
+                    <td style="font-size:13px"> <%= run.env_name %> </td>
+                    <td style="font-size:13px"> <%= run.freq_name %> </td>
+                    <td style="font-size:13px"> <%= run.seed %> </td>
+                    <td style="font-size:13px"> <%= run.gpu_id %> </td>
+                    <td style="font-size:13px"> <%= run.status %> </td>
+                    <td style="font-size:13px"> <%= run.submit_time %> </td>
+                </tr>
+            <% } %>
+        </table>
+    </div>
+</div>
+
+<h3>
+    command line
+</h3>
+
+<div class="row">
+    <div class="col-xs-12">
+        <pre style="background-color:white; white-space: pre-wrap;"><%= run.command_line %></pre>
+    </div>
+</div>
+
+<h3>
+    stdout
+</h3>
+<p>
+    <a target="_blank" href="/detail/<%= run.run_id %>/stdout"> download raw </a>
+</p>
+
+<div class="row">
+    <div class="col-xs-12">
+        <pre id="stdout_content" style="background-color:white"><%= utils.and_more_middle(stdout_content, 2048) %></pre>
+    </div>
+</div>
+
+<script src="/static/libs/js/ansi_up.js" type="text/javascript"></script>
+
+<script>
+    var ansi_up = new AnsiUp;
+    var cdiv = document.getElementById("stdout_content");
+    cdiv.innerHTML = ansi_up.ansi_to_html(cdiv.innerHTML);
+</script>
+
+<h3> stderr </h3>
+<p>
+    <a target="_blank" href="/detail/<%= run.run_id %>/stderr"> download raw </a>
+</p>
+
+<div class="row">
+    <div class="col-xs-12">
+        <pre id="stderr_content" style="background-color:white"><%= utils.and_more_middle(stderr_content, 2048) %></pre>
+    </div>
+</div>
+
+<script>
+    var ansi_up = new AnsiUp;
+    var cdiv = document.getElementById("stderr_content");
+    cdiv.innerHTML = ansi_up.ansi_to_html(cdiv.innerHTML);
+</script>
+
+<%- include("footer") %>
