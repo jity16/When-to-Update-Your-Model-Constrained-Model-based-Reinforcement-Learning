@@ -9,9 +9,11 @@ Depending on your preferred interface for running this code, there are three pri
 ### Run CMLO under Cat-Runner 
 
 [Cat-Runner Webpage Interface]
+
 1. Refer to **How to Start Cat-Runner**, start the Cat-Runner webpage, and then you can interact directly to start your running tasks. If you want different hyperparameters, modify the YAML file in `cat-mbrl-lib/mbrl/examples/conf'
 
 [Cat-Runner Command-Line Interface]
+
 2. Initiate Cat-Runner, but without opening the web page. Instead, use the terminal to control it with the following commands:
 `tools/run`: Start a new task.
 `tools/stop`: Stop a running task.
