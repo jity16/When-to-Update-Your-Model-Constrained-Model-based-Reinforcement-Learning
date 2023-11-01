@@ -5,24 +5,25 @@ Code for [When to Update Your Model: Constrained Model-based Reinforcement Learn
 
 ## Run the Code:
 
-Depending on what interface you want to use to run this code, there are three main ways you can run the code:
+Depending on your preferred interface for running this code, there are three primary methods available:
 ### Run CMLO under Cat-Runner 
 
-1. according to readme.md, start cat-runner, that is, you can open a local web page, direct interaction can be, different parameters according to the yaml file to modify on the line
+[Cat-Runner Webpage Interface]
+1. Refer to **How to Start Cat-Runner**, start the Cat-Runner webpage, and then you can interact directly to start your running tasks. If you want different hyperparameters, modify the YAML file in `cat-mbrl-lib/mbrl/examples/conf'
 
-2. still start cat-runner, but do not need to open the web page. Then open the terminal, you can use the following command:
-`tools/run`: start a new task.
-`tools/stop`: stop a running task.
-`tools/add_to_tensorboard`: add a task to the tensorboard list
-`tools/del_from_tensorboard`: removes a task from the tensorboard list.
+[Cat-Runner Command-Line Interface]
+2. Initiate Cat-Runner, but without opening the web page. Instead, use the terminal to control it with the following commands:
+`tools/run`: Start a new task.
+`tools/stop`: Stop a running task.
+`tools/add_to_tensorboard`: Add a task to the Tensorboard list
+`tools/del_from_tensorboard`: Remove a task from the Tensorboard list.
 
-> Notes: All commands come with their own parameter descriptions and can be called without parameters.
-Open the website and check the status of Cat Runner.
-In the task list, the "Status" column can be clicked to see the detailed parameters and output files.
+> Notes: Each command comes with its own set of parameters and can be executed with or without additional arguments.
+You can also view the status of Cat Runner tasks on the website. In the task list, clicking on the "Status" column will provide access to detailed parameters and output files.
 
 ### Run CMLO without Cat-Runner 
 
-3. Without starting Cat Runner, just run it from the command line as:
+3. If you prefer not to use Cat-Runner, you can run the code from the command line directly. Use the following command: 
 ```
    cd cat-mbrl-lib/ && "
     "CUDA_VISIBLE_DEVICES=%s " // gpu_id
