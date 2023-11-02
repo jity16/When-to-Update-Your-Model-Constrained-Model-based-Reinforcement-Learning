@@ -10,7 +10,6 @@ real_data_ratio: ${overrides.real_data_ratio}
 
 sac_samples_action: true
 initial_exploration_steps: 5000
-# initial_exploration_steps: 50
 random_initial_explore: false
 num_eval_episodes: 1
 

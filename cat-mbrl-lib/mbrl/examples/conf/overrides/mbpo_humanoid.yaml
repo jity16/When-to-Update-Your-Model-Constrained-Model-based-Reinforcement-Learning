@@ -34,22 +34,7 @@ real_data_ratio: 0.05
 freq__fixed:
   event_steps: [400000]
   event_intervals: [250]
-freq__s150:
-  event_steps: [400000]
-  event_intervals: [150]
-freq__s500:
-  event_steps: [400000]
-  event_intervals: [500]
-freq__incre:
-  event_steps: [6000, 11000, 20000, 100000, 200000]
-  event_intervals: [150, 200, 250, 300, 400, 500]
-freq__decre:
-  event_steps: [6000, 11000, 20000, 100000, 200000]
-  event_intervals: [500, 400, 300, 250, 200, 150]
-freq__expand:
-  event_steps: [5000, 8000, 20000, 100000, 200000]
-  event_intervals: [125, 200, 250, 300, 350, 400]
-freq__denseincre:
-  event_steps: [100000, 200000, 300000, 40000, 50000, 60000, 70000, 80000, 90000, 100000, 150000, 200000, 250000, 300000, 400000]
-  event_intervals: [100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 320, 350, 380, 420, 440]
+
+compute_interval: 50
+alpha: 2.5
 

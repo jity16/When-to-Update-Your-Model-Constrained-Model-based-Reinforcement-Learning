@@ -213,8 +213,8 @@ def train(
     epoch = 0
     sac_buffer = None
 
-    compute_interval = 50
-    alpha = 2.0
+    compute_interval = cfg.overrides.compute_interval
+    alpha = cfg.overrides.alpha
     lower_bound = 150
     upper_bound = 500
     writer.add_text('Hyperparamters', "compute_interval: %d, alpha: %f, lower_bound: %d, upper_bound: %d"%(compute_interval, alpha, lower_bound, upper_bound), 1)
