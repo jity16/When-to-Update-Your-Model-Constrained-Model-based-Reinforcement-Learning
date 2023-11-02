@@ -27,17 +27,17 @@ You can also view the status of Cat Runner tasks on the website. In the task lis
 
 3. If you prefer not to use Cat-Runner, you can run the code from the command line directly. Use the following command: 
 ```
-   cd cat-mbrl-lib/ && "
-    "CUDA_VISIBLE_DEVICES=%s " // gpu_id
-    "des=__catrunner_%s__ " // run_id
-    "algo=%s " //algo_name
-    "freq=custom__%s " // freq_name
-    "seed_override=%s " // seed
-    "python -m mbrl.examples.main "
-    "algorithm=cmlo "
-    "overrides=%s " // env_name
-    "> ... /run_status/stdout_%s.txt " // run_id
-    "2> ... /run_status/stderr_%s.txt " // run_id"
+   cd cat-mbrl-lib/ &&
+      CUDA_VISIBLE_DEVICES=%s // gpu_id
+      des=__catrunner_%s__  // run_id
+      algo=%s  //algo_name
+      freq=custom__%s // freq_name
+      seed_override=%s  // seed
+      python -m mbrl.examples.main
+      algorithm=cmlo
+      overrides=%s // env_name
+      > ... /run_status/stdout_%s.txt // run_id
+      2> ... /run_status/stderr_%s.txt // run_id
 ```
 
 
