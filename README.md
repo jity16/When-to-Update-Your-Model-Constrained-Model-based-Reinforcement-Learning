@@ -49,7 +49,8 @@ python -m mbrl.examples.main algorithm=mbpo overrides=mbpo_halfcheetah
 ```
 
 > Note: In terms of parameter adjustments:
-It is necessary to modify the alpha values within the cmlo.py file, whose values can be found in the Appendix.  Rest assured, we plan to provide support for adjusting the alpha values in the config file in the near future. For other parameter adjustments, simply load the corresponding configuration files found in the config directory. 
+It is necessary to modify the alpha values within the cmlo.py file, whose values can be found in the Appendix.
+> For other parameter adjustments, simply load the corresponding configuration files found in the config directory. 
 
 ## How to Start Cat-Runner 
 ### Prerequisites
